@@ -1,23 +1,12 @@
 #!/usr/bin/python3
-
-import math
+"""Minimum Operations"""
 
 
 def minOperations(n):
-    if n < 1:
+    """method that calculates the fewest number of operations needed
+    to result in exactly n H characters in a file"""
+    if n < 2:
         return 0
-
-    # calculate the prime factors of n
-    factors = []
-    while n % 2 == 0:
-        factors.append(2)
-        n //= 2
-    for i in range(3, int(math.sqrt(n))+1, 2):
-        while n % i == 0:
-            factors.append(i)
-            n //= i
-    if n > 2:
-        factors.append(n)
-
-    # calculate the sum of the prime factors
-    return sum(factors)
+    for i in range(2, n+1):
+        if n % i == 0:
+            return minOperations(int(n/i)) + i
