@@ -7,7 +7,7 @@ def validUTF8(data):
     bytes_remaining = 0
 
     for byte in data:
-        binary_byte = format(byte, '08b')
+        binary_byte = format(byte, '#010b')[-8:]
 
         if bytes_remaining == 0:
             for bit in binary_byte:
