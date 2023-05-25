@@ -1,61 +1,86 @@
 #!/usr/bin/python3
 import sys
 
-def is_safe(board, row, col):
-    # Check if there is a queen in the same column
-    for i in range(row):
-        if board[i][col] == 'Q':
-            return False
 
-    # Check if there is a queen in the upper-left diagonal
-    i = row - 1
-    j = col - 1
-    while i >= 0 and j >= 0:
-        if board[i][j] == 'Q':
-            return False
-        i -= 1
-        j -= 1
+def initialize_board(size):
+    """Initialize an `size`x`size` sized chessboard with empty spaces."""
+    board = [[' ' for _ in range(size)] for _ in range(size)]
+    return board
 
-    # Check if there is a queen in the upper-right diagonal
-    i = row - 1
-    j = col + 1
-    while i >= 0 and j < N:
-        if board[i][j] == 'Q':
-            return False
-        i -= 1
-        j += 1
 
-    return True
+def deepcopy_board(board):
+    """Return a deepcopy of a chessboard."""
+    return [row[:] for row in board]
 
-def solve_nqueens(board, row):
-    if row == N:
-        print_solution(board)
+
+def get_solution(board):
+    """Return the list of queen positions in a solved chessboard."""
+    solution = []
+    for row in range(len(board)):
+        for col in range(len(board)):
+            if board[row][col] == "Q":
+                solution.append([row, col])
+    return solution
+
+
+def mark_attacked_spots(board, row, col):
+    """Mark spots on the chessboard where queens can no longer be placed."""
+    size = len(board)
+
+    for c in range(col + 1, size):
+        board[row][c] = "x"  # Mark forward spots
+
+    for c in range(col - 1, -1, -1):
+        board[row][c] = "x"  # Mark backward spots
+
+    for r in range(row + 1, size):
+        board[r][col] = "x"  # Mark spots below
+
+    for r in range(row - 1, -1, -1):
+        board[r][col] = "x"  # Mark spots above
+
+    r, c = row + 1, col + 1
+    while r < size and c < size:
+        board[r][c] = "x"  # Mark spots diagonally down to the right
+        r += 1
+        c += 1
+
+    r, c = row - 1, col - 1
+    while r >= 0 and c >= 0:
+        board[r][c] = "x"  # Mark spots diagonally up to the left
+        r -= 1
+        c -= 1
+
+    r, c = row - 1, col + 1
+    while r >= 0 and c < size:
+        board[r][c] = "x"  # Mark spots diagonally up to the right
+        r -= 1
+        c += 1
+
+    r, c = row + 1, col - 1
+    while r < size and c >= 0:
+        board[r][c] = "x"  # Mark spots diagonally down to the left
+        r += 1
+        c -= 1
+
+
+def solve_nqueens(board, row, queens, solutions):
+    """Recursively solve the N-queens puzzle."""
+    size = len(board)
+
+    if queens == size:
+        solutions.append(get_solution(board))
         return
 
-    for col in range(N):
-        if is_safe(board, row, col):
-            board[row][col] = 'Q'
-            solve_nqueens(board, row + 1)
-            board[row][col] = '.'
+    for col in range(size):
+        if board[row][col] == " ":
+            new_board = deepcopy_board(board)
+            new_board[row][col] = "Q"
+            mark_attacked_spots(new_board, row, col)
+            solve_nqueens(new_board, row + 1, queens + 1, solutions)
 
-def print_solution(board):
-    for row in board:
-        print(' '.join(row))
-    print()
 
-def nqueens(N):
-    if not isinstance(N, int):
-        print("N must be a number")
-        sys.exit(1)
-
-    if N < 4:
-        print("N must be at least 4")
-        sys.exit(1)
-
-    board = [['.' for _ in range(N)] for _ in range(N)]
-    solve_nqueens(board, 0)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
         sys.exit(1)
@@ -66,5 +91,10 @@ if __name__ == '__main__':
         print("N must be a number")
         sys.exit(1)
 
-    nqueens(N)
+    if N < 4:
+        print("N must be at least 4")
+        sys.exit(1)
+
+    chessboard = initialize_board(N)
+    solutions = []
 
