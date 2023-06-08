@@ -1,3 +1,4 @@
+#!/usr/bin/node
 const util = require('util');
 const request = util.promisify(require('request'));
 
